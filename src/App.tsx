@@ -8,7 +8,7 @@ export const App = () => {
   const [todos, setTodos] = useState(todosFromServer);
 
   const [title, setTitle] = useState('');
-  const [userId, setUserId] = useState(0);
+  const [userId, setUserId] = useState('');
   const [titleError, setTitleError] = useState(false);
   const [userError, setUserError] = useState(false);
 
@@ -16,7 +16,7 @@ export const App = () => {
     event.preventDefault();
 
     const hasTitleError = !title.trim();
-    const hasUserError = userId === 0;
+    const hasUserError = userId === '';
 
     setTitleError(hasTitleError);
     setUserError(hasUserError);
@@ -25,18 +25,20 @@ export const App = () => {
       return;
     }
 
-    const newId = Math.max(...todos.map(todo => todo.id)) + 1;
+    const newId = todos.length
+      ? Math.max(...todos.map(todo => todo.id)) + 1
+      : 1;
 
     const newTodo = {
       id: newId,
       title: title.trim(),
-      userId,
+      userId: Number(userId),
       completed: false,
     };
 
     setTodos(currentTodos => [...currentTodos, newTodo]);
     setTitle('');
-    setUserId(0);
+    setUserId('');
   };
 
   const preparedTodos = todos.map(todo => {
@@ -81,13 +83,11 @@ export const App = () => {
             data-cy="userSelect"
             value={userId}
             onChange={event => {
-              setUserId(+event.target.value);
+              setUserId(event.target.value);
               setUserError(false);
             }}
           >
-            <option value={0} disabled>
-              Choose a user
-            </option>
+            <option value="">Choose a user</option>
 
             {usersFromServer.map(user => (
               <option key={user.id} value={user.id}>
